@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MapPin, Phone, Check, Package, ShoppingCart } from 'lucide-react';
+import { MapPin, Phone, Check, Package, ShoppingCart, Shield, Truck, CreditCard } from 'lucide-react';
 
 interface OrderFormProps {
   pricing: {
@@ -19,17 +19,17 @@ interface OrderFormProps {
 
 const SIZES = [
   { value: '30ml', label: '30 مل', price: 149 },
-  { value: '100ml', label: '100 مل', price: 299 },
+  { value: '100ml', label: '100 مل', price: 299, popular: true },
   { value: '200ml', label: '200 مل', price: 499 }
 ];
 
 const QUANTITIES = [1, 2, 3];
 
-export default function OrderForm({ 
+export default function OrderForm({
   pricing,
-  selectedSize, 
-  setSelectedSize, 
-  quantity, 
+  selectedSize,
+  setSelectedSize,
+  quantity,
   setQuantity,
   hasUpsell,
   setHasUpsell
@@ -42,22 +42,43 @@ export default function OrderForm({
   });
 
   return (
-    <div className="bg-white rounded-2xl p-8 shadow-lg" dir="rtl">
+    <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100" dir="rtl">
       <div className="space-y-8">
-        {/* Product Variations */}
+        {/* Product Title and Price */}
         <div>
-          <h3 className="text-lg font-semibold mb-4">اختر الحجم</h3>
+          <h1 className="text-2xl font-bold text-gray-900">زيت أرغان عضوي فاخر</h1>
+          <div className="mt-2 flex items-center gap-3">
+            <span className="text-3xl font-bold text-emerald-600">{pricing.total} درهم</span>
+            {pricing.discount > 0 && (
+              <span className="text-lg text-gray-400 line-through">{pricing.subtotal} درهم</span>
+            )}
+          </div>
+        </div>
+
+        {/* Size Selection */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">اختر الحجم</h3>
+            {pricing.discount > 0 && (
+              <span className="text-sm text-emerald-600 font-medium">وفر 20% عند شراء قطعتين أو أكثر</span>
+            )}
+          </div>
           <div className="grid grid-cols-3 gap-3">
             {SIZES.map((size) => (
               <button
                 key={size.value}
                 onClick={() => setSelectedSize(size.value)}
-                className={`p-4 rounded-xl border-2 transition-all ${
+                className={`relative p-4 rounded-xl border-2 transition-all ${
                   selectedSize === size.value
-                    ? 'border-emerald-600 bg-emerald-50 shadow-sm'
+                    ? 'border-emerald-600 bg-emerald-50'
                     : 'border-gray-200 hover:border-emerald-200'
                 }`}
               >
+                {size.popular && (
+                  <span className="absolute -top-2.5 right-1/2 translate-x-1/2 bg-emerald-600 text-white text-xs px-3 py-0.5 rounded-full">
+                    الأكثر طلباً
+                  </span>
+                )}
                 <div className="text-sm font-medium">{size.label}</div>
                 <div className={`text-base font-bold mt-1 ${
                   selectedSize === size.value ? 'text-emerald-600' : 'text-gray-900'
@@ -77,7 +98,7 @@ export default function OrderForm({
                 onClick={() => setQuantity(value)}
                 className={`p-4 rounded-xl border-2 transition-all ${
                   quantity === value
-                    ? 'border-emerald-600 bg-emerald-50 shadow-sm'
+                    ? 'border-emerald-600 bg-emerald-50'
                     : 'border-gray-200 hover:border-emerald-200'
                 }`}
               >
@@ -90,8 +111,8 @@ export default function OrderForm({
           </div>
           {quantity >= 2 && (
             <div className="mt-3 bg-emerald-50 text-emerald-700 p-3 rounded-xl flex items-center gap-2">
-              <Check size={20} />
-              <span className="font-medium">خصم 20% تم تطبيقه!</span>
+              <Check size={20} className="shrink-0" />
+              <span className="font-medium">تم تطبيق خصم 20% على طلبك!</span>
             </div>
           )}
         </div>
@@ -151,7 +172,7 @@ export default function OrderForm({
               <label className="block text-sm font-medium text-gray-700 mb-2">الاسم الكامل *</label>
               <input
                 type="text"
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-shadow"
                 placeholder="أدخل اسمك الكامل"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -163,7 +184,7 @@ export default function OrderForm({
               <div className="relative">
                 <input
                   type="tel"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent pl-12"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-shadow pl-12"
                   placeholder="0600000000"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
@@ -178,7 +199,7 @@ export default function OrderForm({
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">المدينة *</label>
             <select
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-shadow"
               value={formData.city}
               onChange={(e) => setFormData({ ...formData, city: e.target.value })}
             >
@@ -197,7 +218,7 @@ export default function OrderForm({
             <div className="relative">
               <input
                 type="text"
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent pr-10"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-shadow pr-10"
                 placeholder="أدخل عنوانك الكامل"
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
@@ -207,23 +228,28 @@ export default function OrderForm({
           </div>
         </div>
 
-        <button className="hidden md:flex w-full bg-emerald-600 text-white py-4 rounded-xl font-medium hover:bg-emerald-700 transition-colors text-lg items-center justify-center gap-2">
+        {/* Order Button */}
+        <button className="w-full bg-emerald-600 text-white py-4 rounded-xl font-medium hover:bg-emerald-700 transition-colors text-lg flex items-center justify-center gap-2 shadow-sm">
           <ShoppingCart size={20} />
           اطلب الآن - الدفع عند الاستلام
         </button>
 
-        <div className="grid grid-cols-3 gap-4 text-center text-sm">
-          <div className="p-3 bg-gray-50 rounded-xl">
+        {/* Trust Badges */}
+        <div className="grid grid-cols-3 gap-4 text-center">
+          <div className="p-4 bg-gray-50 rounded-xl">
+            <Truck className="w-6 h-6 mx-auto mb-2 text-emerald-600" />
             <div className="font-medium">توصيل سريع</div>
-            <div className="text-gray-500">2-4 أيام عمل</div>
+            <div className="text-xs text-gray-500">2-4 أيام عمل</div>
           </div>
-          <div className="p-3 bg-gray-50 rounded-xl">
+          <div className="p-4 bg-gray-50 rounded-xl">
+            <CreditCard className="w-6 h-6 mx-auto mb-2 text-emerald-600" />
             <div className="font-medium">الدفع عند الاستلام</div>
-            <div className="text-gray-500">آمن و مضمون</div>
+            <div className="text-xs text-gray-500">آمن و مضمون</div>
           </div>
-          <div className="p-3 bg-gray-50 rounded-xl">
+          <div className="p-4 bg-gray-50 rounded-xl">
+            <Shield className="w-6 h-6 mx-auto mb-2 text-emerald-600" />
             <div className="font-medium">ضمان الجودة</div>
-            <div className="text-gray-500">منتج أصلي 100%</div>
+            <div className="text-xs text-gray-500">منتج أصلي 100%</div>
           </div>
         </div>
       </div>

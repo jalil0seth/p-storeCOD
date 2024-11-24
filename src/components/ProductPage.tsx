@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { ChevronRight, CheckCircle2 } from 'lucide-react';
+import { ChevronRight, CheckCircle2, Play } from 'lucide-react';
 import Header from './Header';
 import OrderForm from './OrderForm';
 import MobileOrderBar from './MobileOrderBar';
@@ -32,7 +32,7 @@ const relatedProducts: Product[] = [
   }
 ];
 
-export function calculatePrice(size: string, quantity: number, hasUpsell: boolean) {
+function calculatePrice(size: string, quantity: number, hasUpsell: boolean) {
   const SIZES = {
     '30ml': 149,
     '100ml': 299,
@@ -55,12 +55,25 @@ function ProductPage() {
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState('100ml');
   const [hasUpsell, setHasUpsell] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
   const formRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const pricing = calculatePrice(selectedSize, quantity, hasUpsell);
 
   const scrollToForm = () => {
     formRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const toggleVideo = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
   };
 
   return (
@@ -120,28 +133,89 @@ function ProductPage() {
         {/* Product Description */}
         <div className="mt-16" dir="rtl">
           <div className="bg-white rounded-2xl p-8">
-            <h2 className="text-2xl font-semibold mb-6">وصف المنتج</h2>
-            <div className="prose max-w-none">
-              <p className="text-gray-600">
-                زيت الأرغان العضوي الفاخر مستخرج يدويًا من قبل تعاونيات نسائية في منطقة سوس بالمغرب. 
-                غني بفيتامين E والأحماض الدهنية الأساسية، هذا الزيت متعدد الاستخدامات يمكن استخدامه للوجه 
-                والشعر والجسم. معتمد عضويًا ومعصور على البارد للحفاظ على جميع فوائده.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-                <div className="flex flex-col items-center text-center p-4 bg-emerald-50 rounded-lg">
-                  <CheckCircle2 size={24} className="text-emerald-600 mb-2" />
-                  <h3 className="font-medium mb-1">100% عضوي</h3>
-                  <p className="text-sm text-gray-600">معتمد عضويًا</p>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+              {/* Video Section */}
+              <div className="relative aspect-video rounded-xl overflow-hidden">
+                <div className={`absolute inset-0 bg-black/20 flex items-center justify-center ${!isPlaying ? 'block' : 'hidden'} cursor-pointer`} onClick={toggleVideo}>
+                  <button className="bg-white/90 rounded-full p-4 transform transition-transform hover:scale-110">
+                    <Play size={24} className="text-emerald-600" />
+                  </button>
                 </div>
-                <div className="flex flex-col items-center text-center p-4 bg-emerald-50 rounded-lg">
-                  <CheckCircle2 size={24} className="text-emerald-600 mb-2" />
-                  <h3 className="font-medium mb-1">معصور على البارد</h3>
-                  <p className="text-sm text-gray-600">يحافظ على العناصر الغذائية</p>
+                <video 
+                  ref={videoRef}
+                  className="w-full h-full object-cover"
+                  poster="https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&q=80&w=2000"
+                  onClick={toggleVideo}
+                >
+                  <source src="https://player.vimeo.com/external/194837908.sd.mp4?s=c350076905b78c67f74d7ee39fdb4fef01d12420&profile_id=164" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+
+              {/* Product Details */}
+              <div className="space-y-6">
+                <h2 className="text-2xl font-semibold">مميزات المنتج</h2>
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 size={24} className="text-emerald-600 mt-1" />
+                    <div>
+                      <h3 className="font-medium text-lg">100% عضوي ونقي</h3>
+                      <p className="text-gray-600">معصور على البارد للحفاظ على جميع العناصر الغذائية والفيتامينات</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 size={24} className="text-emerald-600 mt-1" />
+                    <div>
+                      <h3 className="font-medium text-lg">غني بفيتامين E</h3>
+                      <p className="text-gray-600">يحتوي على نسبة عالية من مضادات الأكسدة ومضادات الالتهابات</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 size={24} className="text-emerald-600 mt-1" />
+                    <div>
+                      <h3 className="font-medium text-lg">متعدد الاستخدامات</h3>
+                      <p className="text-gray-600">مناسب للبشرة والشعر والأظافر، يمكن استخدامه للوجه والجسم</p>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex flex-col items-center text-center p-4 bg-emerald-50 rounded-lg">
-                  <CheckCircle2 size={24} className="text-emerald-600 mb-2" />
-                  <h3 className="font-medium mb-1">تجارة عادلة</h3>
-                  <p className="text-sm text-gray-600">يدعم التعاونيات المحلية</p>
+              </div>
+            </div>
+
+            {/* Additional Information */}
+            <div className="mt-12 space-y-8">
+              <div>
+                <h3 className="text-xl font-semibold mb-4">طريقة الاستخدام</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-600 pr-4">
+                  <li>للبشرة: ضعي بضع قطرات على بشرة نظيفة ورطبة ودلكي برفق</li>
+                  <li>للشعر: وزعي كمية مناسبة على الشعر الرطب من الجذور حتى الأطراف</li>
+                  <li>للأظافر: دلكي قطرتين على الأظافر وحول البشرة المحيطة</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-xl font-semibold mb-4">المكونات</h3>
+                <p className="text-gray-600">100% زيت أرغان عضوي نقي (Argania Spinosa Kernel Oil)</p>
+              </div>
+
+              <div>
+                <h3 className="text-xl font-semibold mb-4">معلومات إضافية</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <span className="font-medium">بلد المنشأ:</span>
+                    <span className="text-gray-600 mr-2">المغرب</span>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <span className="font-medium">الشهادات:</span>
+                    <span className="text-gray-600 mr-2">معتمد عضوياً</span>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <span className="font-medium">مدة الصلاحية:</span>
+                    <span className="text-gray-600 mr-2">24 شهر</span>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <span className="font-medium">طريقة التخزين:</span>
+                    <span className="text-gray-600 mr-2">في مكان بارد وجاف</span>
+                  </div>
                 </div>
               </div>
             </div>
